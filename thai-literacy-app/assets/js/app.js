@@ -12,7 +12,9 @@
   const toneChoices = ['mid', 'low', 'falling', 'high', 'rising'];
 
   const fetchConfig = async () => {
-    const response = await fetch(`${TLA_APP.restUrl}/config`);
+    const configUrl = new URL(`${TLA_APP.restUrl}/config`, window.location.origin);
+    if (TLA_APP.postId) configUrl.searchParams.set('post_id', String(TLA_APP.postId));
+    const response = await fetch(configUrl.toString());
     return response.json();
   };
 
