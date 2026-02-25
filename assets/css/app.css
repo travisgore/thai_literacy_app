@@ -1,32 +1,235 @@
 .tla-shell {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --tla-group-high: #d16600;
+  --tla-group-mid: #0050b3;
+  --tla-group-low: #007f5f;
+  --tla-surface: #f9fbff;
+  --tla-surface-strong: #eef4ff;
+  --tla-border: #ccd9f7;
+  --tla-text: #172033;
+  --tla-muted: #4b5870;
+  font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
   max-width: 920px;
   margin: 0 auto;
-  color: #1f2233;
+  padding: 12px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(47, 115, 255, 0.08), transparent 28%),
+    radial-gradient(circle at 90% 100%, rgba(0, 127, 95, 0.08), transparent 32%),
+    #ffffff;
+  color: var(--tla-text);
+  font-size: 18px;
+  line-height: 1.45;
 }
 
 .tla-header {
   margin-bottom: 16px;
 }
 
-.tla-card {
-  background: #f7f8ff;
-  border: 1px solid #d6d9f8;
-  border-radius: 10px;
-  padding: 16px;
-  margin-bottom: 16px;
+.tla-header h2 {
+  margin-bottom: 6px;
 }
 
-.tla-subcard {
-  background: #ffffff;
-  border: 1px solid #dfe2f7;
-  border-radius: 8px;
-  padding: 12px;
+.tla-header p {
+  margin-top: 0;
+  color: var(--tla-muted);
+}
+
+.tla-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tla-stats-toggle {
+  white-space: nowrap;
+  font-size: 1rem;
+  padding: 10px 14px;
+}
+
+.tla-flip-scene {
+  perspective: 1400px;
+}
+
+.tla-flip-card {
+  position: relative;
+}
+
+.tla-flip-face {
+  transition: transform 0.48s ease, opacity 0.48s ease;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.tla-flip-front {
+  opacity: 1;
+  transform: rotateY(0deg);
+}
+
+.tla-flip-back {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: rotateY(-180deg);
+  pointer-events: none;
+}
+
+.tla-flip-card.is-flipped .tla-flip-front {
+  opacity: 0;
+  transform: rotateY(180deg);
+  pointer-events: none;
+}
+
+.tla-flip-card.is-flipped .tla-flip-back {
+  opacity: 1;
+  transform: rotateY(0deg);
+  pointer-events: auto;
+}
+
+.tla-card {
+  background: linear-gradient(180deg, var(--tla-surface) 0%, var(--tla-surface-strong) 100%);
+  border: 1px solid var(--tla-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 20px rgba(13, 40, 86, 0.08);
+  animation: tlaCardIn 0.36s ease both;
+}
+
+.tla-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.tla-card p {
+  margin-top: 0;
+}
+
+.tla-card-lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.tla-card-lead-copy h3 {
+  margin: 0 0 2px;
+}
+
+.tla-card-lead-copy p {
+  margin: 0;
+}
+
+.tla-stage-context-pill {
+  border: 1px solid #bcc9ef;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #e8f0ff;
+  color: #15428a;
+  font-size: 0.92rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tla-card-learn {
+  border-left: 6px solid #2f73ff;
+}
+
+.tla-card-test {
+  border-left: 6px solid #7b3af6;
+}
+
+.tla-legend-card p {
+  margin-bottom: 10px;
+}
+
+.tla-legend-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tla-stage-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tla-stage-pill {
+  border: 1px solid #bcc9ef;
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: #f4f7ff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #50607d;
+}
+
+.tla-stage-pill.is-active {
+  border-color: #2f73ff;
+  background: #e8f0ff;
+  color: #15428a;
+}
+
+.tla-stage-pill.is-complete {
+  border-color: #0f7f5f;
+  background: #e6f8f2;
+  color: #0f5f48;
+}
+
+.tla-srs-note {
+  margin: -2px 0 12px;
+  color: #4a5b7a;
+  font-size: 0.98rem;
+}
+
+.tla-progress-card {
+  border-left: 6px solid #1d4ed8;
+}
+
+.tla-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.tla-progress-head h3 {
+  margin: 0;
+}
+
+.tla-progress-head p {
+  margin: 0;
+  color: #31538d;
+  font-weight: 700;
+}
+
+.tla-progress-track {
+  height: 16px;
+  border-radius: 999px;
+  background: #d9e7ff;
+  overflow: hidden;
+  border: 1px solid #b7cdfa;
+  margin: 10px 0 8px;
+}
+
+.tla-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1d4ed8 0%, #0ea86f 100%);
+  transition: width 0.3s ease;
+}
+
+.tla-progress-note {
+  margin: 0;
+  color: #4c638d;
+  font-size: 0.95rem;
 }
 
 .tla-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
@@ -36,32 +239,434 @@
   gap: 8px;
 }
 
-.tla-btn {
-  border: 1px solid #7f87dd;
-  background: white;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
+.tla-option-row {
+  margin-top: 12px;
 }
 
-.tla-btn.is-active,
+.tla-btn {
+  border: 1px solid #6f8dd8;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+  color: #1f2f54;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
+}
+
 .tla-btn:hover {
-  background: #e7e9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(63, 98, 184, 0.2);
+  background: #f2f6ff;
+}
+
+.tla-btn.is-active {
+  border-color: #2f73ff;
+  background: #e8f0ff;
+  color: #143d82;
+}
+
+.tla-btn.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tla-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.tla-primary-btn {
+  border-color: #2f73ff;
+  background: linear-gradient(180deg, #f2f7ff 0%, #e6efff 100%);
+}
+
+.tla-tone-btn.tla-tone-mid {
+  border-color: #2f73ff;
+}
+
+.tla-tone-btn.tla-tone-low {
+  border-color: #138d5d;
+}
+
+.tla-tone-btn.tla-tone-falling {
+  border-color: #b76200;
+}
+
+.tla-tone-btn.tla-tone-high {
+  border-color: #9f2fef;
+}
+
+.tla-tone-btn.tla-tone-rising {
+  border-color: #dc3f67;
 }
 
 .tla-syllable {
-  font-size: 54px;
-  line-height: 1.15;
-  margin: 8px 0;
+  font-size: 84px;
+  line-height: 1.1;
+  margin: 8px 0 10px;
+  font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
+  animation: tlaPopIn 0.42s ease both;
+}
+
+.tla-syllable-btn {
+  display: block;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+}
+
+.tla-thai {
+  font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
+  font-size: 1.2em;
+  letter-spacing: 0.01em;
+}
+
+.tla-group-high {
+  color: var(--tla-group-high);
+  text-shadow: 0 6px 16px rgba(209, 102, 0, 0.22);
+}
+
+.tla-group-mid {
+  color: var(--tla-group-mid);
+  text-shadow: 0 6px 16px rgba(0, 80, 179, 0.2);
+}
+
+.tla-group-low {
+  color: var(--tla-group-low);
+  text-shadow: 0 6px 16px rgba(0, 127, 95, 0.2);
+}
+
+.tla-group-neutral {
+  color: #000000;
+}
+
+.tla-vowel-text {
+  color: #000000;
+}
+
+.tla-click-audio {
+  cursor: pointer;
+  border-radius: 10px;
+  transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.tla-click-audio:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.tla-click-audio:focus {
+  outline: 3px solid rgba(47, 115, 255, 0.35);
+  outline-offset: 4px;
+}
+
+.tla-word-example {
+  margin: 6px 0 10px;
+  font-size: 1.1rem;
+  color: #1d2b4a;
+}
+
+.tla-word-example-play {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border: 1px solid #9ab6ec;
+  background: #f4f8ff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.tla-word-example-tip {
+  font-size: 0.9rem;
+  color: #315a99;
+  font-weight: 600;
+}
+
+.tla-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.tla-badge {
+  display: inline-block;
+  border-radius: 999px;
+  border: 1px solid #c2d0f3;
+  background: #f7faff;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2d436d;
+}
+
+.tla-badge.tla-group-high {
+  border-color: rgba(209, 102, 0, 0.45);
+  background: rgba(209, 102, 0, 0.12);
+}
+
+.tla-badge.tla-group-mid {
+  border-color: rgba(0, 80, 179, 0.45);
+  background: rgba(0, 80, 179, 0.12);
+}
+
+.tla-badge.tla-group-low {
+  border-color: rgba(0, 127, 95, 0.45);
+  background: rgba(0, 127, 95, 0.12);
+}
+
+.tla-explanation {
+  margin: 8px 0 10px;
+  color: #27385b;
+  font-weight: 600;
 }
 
 .tla-meta,
-.tla-ipa,
-.tla-feedback {
+.tla-ipa {
   margin: 8px 0;
+  color: #2b3c5d;
+  font-size: 1.03rem;
 }
 
-.tla-lesson-list {
-  margin: 0;
-  padding-left: 20px;
+.tla-feedback {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.tla-feedback.is-correct {
+  background: #e7faef;
+  color: #0c5e3f;
+  border: 1px solid #9adab8;
+  animation: tlaGoodPulse 0.36s ease both;
+}
+
+.tla-feedback.is-incorrect {
+  background: #fff1f1;
+  color: #8e2234;
+  border: 1px solid #f0b6c2;
+  animation: tlaShake 0.34s ease both;
+}
+
+.tla-next-btn {
+  margin-top: 10px;
+}
+
+.tla-submit-btn {
+  margin-top: 10px;
+}
+
+.tla-audio-wrap {
+  margin: 8px 0 12px;
+}
+
+.tla-audio-wrap p {
+  margin: 0 0 6px;
+  color: var(--tla-muted);
+  font-size: 0.95rem;
+}
+
+.tla-audio-wrap audio {
+  width: 100%;
+}
+
+.tla-pron-option-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.tla-pron-option-card {
+  border: 1px solid #c9d6f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fbfdff;
+}
+
+.tla-pron-option-card p {
+  margin: 0 0 6px;
+}
+
+.tla-stats-card {
+  border-left: 6px solid #0f7f5f;
+}
+
+.tla-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 8px 0 14px;
+}
+
+.tla-stats-item {
+  border: 1px solid #c7d9f5;
+  background: #f8fbff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.tla-stats-item strong {
+  display: block;
+  font-size: 1.25rem;
+  color: #173d77;
+}
+
+.tla-stats-item span {
+  color: #3e5278;
+  font-size: 0.95rem;
+}
+
+.tla-stage-stats {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tla-stage-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #d2ddf5;
+  border-radius: 10px;
+  background: #f9fbff;
+  padding: 8px 10px;
+}
+
+.tla-stage-stats-row strong {
+  min-width: 120px;
+}
+
+.tla-complete-card {
+  border-left: 6px solid #0f7f5f;
+  background: linear-gradient(180deg, #f2fff8 0%, #e8f8ef 100%);
+}
+
+.tla-option-row .tla-btn {
+  animation: tlaOptionIn 0.32s ease both;
+}
+
+.tla-option-row .tla-btn:nth-child(1) {
+  animation-delay: 0.02s;
+}
+
+.tla-option-row .tla-btn:nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+.tla-option-row .tla-btn:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.tla-option-row .tla-btn:nth-child(4) {
+  animation-delay: 0.14s;
+}
+
+.tla-option-row .tla-btn:nth-child(5) {
+  animation-delay: 0.18s;
+}
+
+@keyframes tlaCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tlaPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tlaOptionIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tlaGoodPulse {
+  0% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes tlaShake {
+  0% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .tla-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tla-progress-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .tla-card-lead {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .tla-shell {
+    font-size: 17px;
+  }
+
+  .tla-btn {
+    font-size: 1.08rem;
+    padding: 10px 14px;
+  }
+
+  .tla-syllable {
+    font-size: 68px;
+  }
+
+  .tla-stage-pill {
+    font-size: 0.87rem;
+  }
 }
