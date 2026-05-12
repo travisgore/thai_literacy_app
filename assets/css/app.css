@@ -1,104 +1,249 @@
+/* Pixel font — loaded via PHP wp_enqueue_style */
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
 .tla-shell {
-  --tla-group-high: #d16600;
-  --tla-group-mid: #0050b3;
-  --tla-group-low: #007f5f;
-  --tla-surface: #f9fbff;
-  --tla-surface-strong: #eef4ff;
-  --tla-border: #ccd9f7;
-  --tla-text: #172033;
-  --tla-muted: #4b5870;
+  --tla-group-high: #e07000;
+  --tla-group-mid: #0f5ec0;
+  --tla-group-low: #00903c;
+  --tla-surface: #f8f5ee;
+  --tla-surface-strong: #ede9de;
+  --tla-border: #1a1a2e;
+  --tla-text: #1a1a2e;
+  --tla-muted: #5a6075;
+  --tla-gold: #ffd700;
+  --tla-shell-bg: #1a1c2c;
+  --tla-pixel-font: 'Press Start 2P', monospace;
+  --tla-pixel-border: 3px solid #1a1a2e;
+  --tla-pixel-shadow: 4px 4px 0 0 rgba(26, 26, 46, 0.35);
+
   font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
   max-width: 920px;
   margin: 0 auto;
-  padding: 12px;
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(47, 115, 255, 0.08), transparent 28%),
-    radial-gradient(circle at 90% 100%, rgba(0, 127, 95, 0.08), transparent 32%),
-    #ffffff;
+  padding: 0;
+  border-radius: 4px;
+  background: var(--tla-shell-bg);
   color: var(--tla-text);
   font-size: 18px;
   line-height: 1.45;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
-.tla-header {
-  margin-bottom: 16px;
+/* =========================================================
+   GAME HEADER + NAV
+   ========================================================= */
+.tla-game-header {
+  background: linear-gradient(160deg, #1a1c2c 0%, #2a2d4a 100%);
+  padding: 16px 20px 0;
+  border-bottom: 3px solid var(--tla-gold);
 }
 
-.tla-header h2 {
-  margin-bottom: 6px;
-}
-
-.tla-header p {
-  margin-top: 0;
-  color: var(--tla-muted);
-}
-
-.tla-header-row {
+.tla-game-header-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+  margin-bottom: 12px;
 }
 
-.tla-stats-toggle {
+.tla-game-title {
+  font-family: var(--tla-pixel-font);
+  font-size: 12px;
+  color: var(--tla-gold);
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* Info icon + popup */
+.tla-info-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tla-info-btn {
+  background: transparent;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  color: var(--tla-gold);
+  font-family: var(--tla-pixel-font);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.tla-info-btn:hover,
+.tla-info-btn.is-open {
+  border-color: var(--tla-gold);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.tla-info-popup {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 290px;
+  background: #12141f;
+  color: #e0e0e8;
+  border: var(--tla-pixel-border);
+  box-shadow: 5px 5px 0 0 rgba(0, 0, 0, 0.6);
+  padding: 14px 16px;
+  z-index: 200;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.tla-info-popup.is-open {
+  display: block;
+  animation: tlaCardIn 0.2s ease both;
+}
+
+.tla-info-popup h4 {
+  font-family: var(--tla-pixel-font);
+  font-size: 8px;
+  color: var(--tla-gold);
+  margin: 0 0 10px;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+}
+
+.tla-info-popup p {
+  margin: 0 0 8px;
+  color: #c0c4d8;
+  font-size: 0.85rem;
+}
+
+.tla-info-popup p:last-child {
+  margin-bottom: 0;
+}
+
+.tla-info-section {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tla-info-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.tla-info-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  color: #c0c4d8;
+}
+
+.tla-info-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Nav tabs */
+.tla-nav {
+  display: flex;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.tla-nav-tab {
+  font-family: var(--tla-pixel-font);
+  font-size: 8px;
+  padding: 11px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  transition: color 0.12s, border-color 0.12s;
   white-space: nowrap;
-  font-size: 1rem;
-  padding: 10px 14px;
 }
 
-.tla-flip-scene {
-  perspective: 1400px;
+.tla-nav-tab:hover {
+  color: rgba(255, 255, 255, 0.75);
 }
 
-.tla-flip-card {
+.tla-nav-tab.is-active {
+  color: var(--tla-gold);
+  border-bottom-color: var(--tla-gold);
+  background: rgba(255, 215, 0, 0.06);
+}
+
+/* =========================================================
+   GAME CONTENT WRAPPER
+   ========================================================= */
+.tla-game-content {
+  background: var(--tla-surface);
+  padding: 16px;
+  min-height: 320px;
+}
+
+/* =========================================================
+   STAGE INSTRUCTION BANNER
+   ========================================================= */
+.tla-stage-banner {
+  background: var(--tla-shell-bg);
+  color: #ffffff;
+  border: var(--tla-pixel-border);
+  box-shadow: var(--tla-pixel-shadow);
+  padding: 12px 16px;
+  margin-bottom: 16px;
   position: relative;
 }
 
-.tla-flip-face {
-  transition: transform 0.48s ease, opacity 0.48s ease;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+.tla-stage-banner-label {
+  font-family: var(--tla-pixel-font);
+  font-size: 8px;
+  color: var(--tla-gold);
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1.7;
 }
 
-.tla-flip-front {
-  opacity: 1;
-  transform: rotateY(0deg);
+.tla-stage-banner p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
-.tla-flip-back {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transform: rotateY(-180deg);
-  pointer-events: none;
-}
-
-.tla-flip-card.is-flipped .tla-flip-front {
-  opacity: 0;
-  transform: rotateY(180deg);
-  pointer-events: none;
-}
-
-.tla-flip-card.is-flipped .tla-flip-back {
-  opacity: 1;
-  transform: rotateY(0deg);
-  pointer-events: auto;
-}
-
+/* =========================================================
+   CARDS
+   ========================================================= */
 .tla-card {
-  background: linear-gradient(180deg, var(--tla-surface) 0%, var(--tla-surface-strong) 100%);
-  border: 1px solid var(--tla-border);
-  border-radius: 12px;
+  background: #ffffff;
+  border: var(--tla-pixel-border);
+  box-shadow: var(--tla-pixel-shadow);
   padding: 16px;
   margin-bottom: 16px;
-  box-shadow: 0 8px 20px rgba(13, 40, 86, 0.08);
-  animation: tlaCardIn 0.36s ease both;
+  animation: tlaCardIn 0.28s ease both;
 }
 
 .tla-card h3 {
   margin-top: 0;
   margin-bottom: 8px;
+  font-family: var(--tla-pixel-font);
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--tla-text);
 }
 
 .tla-card p {
@@ -109,7 +254,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .tla-card-lead-copy h3 {
@@ -121,22 +266,24 @@
 }
 
 .tla-stage-context-pill {
-  border: 1px solid #bcc9ef;
-  border-radius: 999px;
+  border: 2px solid #1a1a2e;
   padding: 5px 10px;
-  background: #e8f0ff;
-  color: #15428a;
-  font-size: 0.92rem;
-  font-weight: 800;
+  background: var(--tla-shell-bg);
+  color: var(--tla-gold);
+  font-family: var(--tla-pixel-font);
+  font-size: 7px;
+  font-weight: 400;
   white-space: nowrap;
+  letter-spacing: 0.05em;
+  line-height: 1.7;
 }
 
 .tla-card-learn {
-  border-left: 6px solid #2f73ff;
+  border-left: 5px solid #2f73ff;
 }
 
 .tla-card-test {
-  border-left: 6px solid #7b3af6;
+  border-left: 5px solid #7b3af6;
 }
 
 .tla-legend-card p {
@@ -157,13 +304,13 @@
 }
 
 .tla-stage-pill {
-  border: 1px solid #bcc9ef;
-  border-radius: 999px;
-  padding: 6px 12px;
+  border: 2px solid #1a1a2e;
+  padding: 5px 10px;
   background: #f4f7ff;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-family: var(--tla-pixel-font);
+  font-size: 7px;
   color: #50607d;
+  line-height: 1.7;
 }
 
 .tla-stage-pill.is-active {
@@ -178,14 +325,11 @@
   color: #0f5f48;
 }
 
-.tla-srs-note {
-  margin: -2px 0 12px;
-  color: #4a5b7a;
-  font-size: 0.98rem;
-}
-
+/* =========================================================
+   PROGRESS BAR
+   ========================================================= */
 .tla-progress-card {
-  border-left: 6px solid #1d4ed8;
+  border-left: 5px solid #1d4ed8;
 }
 
 .tla-progress-head {
@@ -201,32 +345,63 @@
 
 .tla-progress-head p {
   margin: 0;
+  font-family: var(--tla-pixel-font);
+  font-size: 8px;
   color: #31538d;
-  font-weight: 700;
+  line-height: 1.7;
 }
 
 .tla-progress-track {
-  height: 16px;
-  border-radius: 999px;
-  background: #d9e7ff;
+  height: 18px;
+  background: #d0daf5;
   overflow: hidden;
-  border: 1px solid #b7cdfa;
+  border: 2px solid #1a1a2e;
+  box-shadow: 2px 2px 0 0 rgba(26, 26, 46, 0.25);
   margin: 10px 0 8px;
+  position: relative;
+}
+
+/* Pixel chunk effect on progress bar */
+.tla-progress-track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent calc(8.333% - 2px),
+    rgba(26, 26, 46, 0.08) calc(8.333% - 2px),
+    rgba(26, 26, 46, 0.08) 8.333%
+  );
+  pointer-events: none;
 }
 
 .tla-progress-fill {
   height: 100%;
-  border-radius: 999px;
   background: linear-gradient(90deg, #1d4ed8 0%, #0ea86f 100%);
-  transition: width 0.3s ease;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.tla-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  right: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .tla-progress-note {
   margin: 0;
   color: #4c638d;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
+/* =========================================================
+   GRID + ROW UTILITIES
+   ========================================================= */
 .tla-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -243,75 +418,79 @@
   margin-top: 12px;
 }
 
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 .tla-btn {
-  border: 1px solid #6f8dd8;
+  border: var(--tla-pixel-border);
   background: #ffffff;
-  border-radius: 10px;
+  box-shadow: var(--tla-pixel-shadow);
   padding: 12px 16px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   line-height: 1.3;
   cursor: pointer;
   color: #1f2f54;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
   font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
+  border-radius: 0;
+  position: relative;
 }
 
 .tla-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(63, 98, 184, 0.2);
-  background: #f2f6ff;
+  transform: translateY(-2px);
+  box-shadow: 4px 6px 0 0 rgba(26, 26, 46, 0.35);
+  background: #f4f7ff;
+}
+
+.tla-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 rgba(26, 26, 46, 0.35);
 }
 
 .tla-btn.is-active {
   border-color: #2f73ff;
   background: #e8f0ff;
   color: #143d82;
+  box-shadow: 2px 2px 0 0 rgba(47, 115, 255, 0.4);
+  transform: translate(2px, 2px);
 }
 
-.tla-btn.is-disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
+.tla-btn.is-disabled,
 .tla-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
+  box-shadow: var(--tla-pixel-shadow);
 }
 
 .tla-primary-btn {
   border-color: #2f73ff;
-  background: linear-gradient(180deg, #f2f7ff 0%, #e6efff 100%);
+  background: linear-gradient(180deg, #f0f6ff 0%, #e0ecff 100%);
+  color: #0a2d7a;
 }
 
-.tla-tone-btn.tla-tone-mid {
-  border-color: #2f73ff;
+.tla-primary-btn:hover {
+  background: linear-gradient(180deg, #e8f0ff 0%, #d0e0ff 100%);
 }
 
-.tla-tone-btn.tla-tone-low {
-  border-color: #138d5d;
-}
+/* Tone-specific button borders */
+.tla-tone-btn.tla-tone-mid   { border-color: #2f73ff; }
+.tla-tone-btn.tla-tone-low   { border-color: #138d5d; }
+.tla-tone-btn.tla-tone-falling { border-color: #b76200; }
+.tla-tone-btn.tla-tone-high  { border-color: #9f2fef; }
+.tla-tone-btn.tla-tone-rising { border-color: #dc3f67; }
 
-.tla-tone-btn.tla-tone-falling {
-  border-color: #b76200;
-}
-
-.tla-tone-btn.tla-tone-high {
-  border-color: #9f2fef;
-}
-
-.tla-tone-btn.tla-tone-rising {
-  border-color: #dc3f67;
-}
-
+/* =========================================================
+   THAI SYLLABLE DISPLAY
+   ========================================================= */
 .tla-syllable {
-  font-size: 84px;
+  font-size: 88px;
   line-height: 1.1;
   margin: 8px 0 10px;
   font-family: "Noto Sans Thai", "Sarabun", "Thonburi", "Leelawadee UI", "Segoe UI", sans-serif;
-  animation: tlaPopIn 0.42s ease both;
+  animation: tlaPopIn 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  display: block;
 }
 
 .tla-syllable-btn {
@@ -321,6 +500,7 @@
   padding: 0;
   text-align: left;
   color: inherit;
+  cursor: pointer;
 }
 
 .tla-thai {
@@ -329,45 +509,55 @@
   letter-spacing: 0.01em;
 }
 
+/* Consonant class colors */
 .tla-group-high {
   color: var(--tla-group-high);
-  text-shadow: 0 6px 16px rgba(209, 102, 0, 0.22);
+  text-shadow: 3px 3px 0 rgba(224, 112, 0, 0.2);
 }
 
 .tla-group-mid {
   color: var(--tla-group-mid);
-  text-shadow: 0 6px 16px rgba(0, 80, 179, 0.2);
+  text-shadow: 3px 3px 0 rgba(15, 94, 192, 0.2);
 }
 
 .tla-group-low {
   color: var(--tla-group-low);
-  text-shadow: 0 6px 16px rgba(0, 127, 95, 0.2);
+  text-shadow: 3px 3px 0 rgba(0, 144, 60, 0.2);
 }
 
 .tla-group-neutral {
-  color: #000000;
+  color: #1a1a2e;
 }
 
 .tla-vowel-text {
-  color: #000000;
+  color: #1a1a2e;
 }
 
+/* =========================================================
+   CLICK-TO-PLAY AUDIO
+   ========================================================= */
 .tla-click-audio {
   cursor: pointer;
-  border-radius: 10px;
-  transition: transform 0.16s ease, filter 0.16s ease;
+  transition: transform 0.1s ease, filter 0.1s ease;
 }
 
 .tla-click-audio:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.04);
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.05);
+}
+
+.tla-click-audio:active {
+  transform: translate(2px, 2px);
 }
 
 .tla-click-audio:focus {
-  outline: 3px solid rgba(47, 115, 255, 0.35);
+  outline: 3px solid rgba(47, 115, 255, 0.5);
   outline-offset: 4px;
 }
 
+/* =========================================================
+   WORD EXAMPLE HINT
+   ========================================================= */
 .tla-word-example {
   margin: 6px 0 10px;
   font-size: 1.1rem;
@@ -379,21 +569,35 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  border: 1px solid #9ab6ec;
+  border: var(--tla-pixel-border);
+  box-shadow: 3px 3px 0 rgba(26, 26, 46, 0.2);
   background: #f4f8ff;
-  border-radius: 10px;
   padding: 8px 12px;
   cursor: pointer;
   font: inherit;
   text-align: left;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.tla-word-example-play:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 4px 0 rgba(26, 26, 46, 0.25);
+}
+
+.tla-word-example-play:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 rgba(26, 26, 46, 0.2);
 }
 
 .tla-word-example-tip {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: #315a99;
   font-weight: 600;
 }
 
+/* =========================================================
+   BADGES
+   ========================================================= */
 .tla-badge-row {
   display: flex;
   flex-wrap: wrap;
@@ -403,30 +607,35 @@
 
 .tla-badge {
   display: inline-block;
-  border-radius: 999px;
-  border: 1px solid #c2d0f3;
+  border: 2px solid #1a1a2e;
   background: #f7faff;
-  padding: 5px 10px;
-  font-size: 0.9rem;
+  padding: 4px 10px;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #2d436d;
 }
 
 .tla-badge.tla-group-high {
-  border-color: rgba(209, 102, 0, 0.45);
-  background: rgba(209, 102, 0, 0.12);
+  border-color: var(--tla-group-high);
+  background: rgba(224, 112, 0, 0.12);
+  color: #7a3c00;
 }
 
 .tla-badge.tla-group-mid {
-  border-color: rgba(0, 80, 179, 0.45);
-  background: rgba(0, 80, 179, 0.12);
+  border-color: var(--tla-group-mid);
+  background: rgba(15, 94, 192, 0.12);
+  color: #073080;
 }
 
 .tla-badge.tla-group-low {
-  border-color: rgba(0, 127, 95, 0.45);
-  background: rgba(0, 127, 95, 0.12);
+  border-color: var(--tla-group-low);
+  background: rgba(0, 144, 60, 0.12);
+  color: #004d22;
 }
 
+/* =========================================================
+   EXPLANATION + META TEXT
+   ========================================================= */
 .tla-explanation {
   margin: 8px 0 10px;
   color: #27385b;
@@ -437,28 +646,33 @@
 .tla-ipa {
   margin: 8px 0;
   color: #2b3c5d;
-  font-size: 1.03rem;
+  font-size: 1rem;
 }
 
+/* =========================================================
+   FEEDBACK (CORRECT / INCORRECT)
+   ========================================================= */
 .tla-feedback {
   margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 12px 14px;
   font-weight: 700;
+  border: var(--tla-pixel-border);
 }
 
 .tla-feedback.is-correct {
-  background: #e7faef;
-  color: #0c5e3f;
-  border: 1px solid #9adab8;
-  animation: tlaGoodPulse 0.36s ease both;
+  background: #e0faea;
+  color: #0a4f30;
+  border-color: #0a9f5a;
+  box-shadow: 4px 4px 0 0 rgba(10, 159, 90, 0.3);
+  animation: tlaCorrectPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .tla-feedback.is-incorrect {
-  background: #fff1f1;
+  background: #fff0f0;
   color: #8e2234;
-  border: 1px solid #f0b6c2;
-  animation: tlaShake 0.34s ease both;
+  border-color: #cc3050;
+  box-shadow: 4px 4px 0 0 rgba(204, 48, 80, 0.25);
+  animation: tlaShake 0.36s ease both;
 }
 
 .tla-next-btn {
@@ -469,6 +683,9 @@
   margin-top: 10px;
 }
 
+/* =========================================================
+   AUDIO PLAYER
+   ========================================================= */
 .tla-audio-wrap {
   margin: 8px 0 12px;
 }
@@ -476,13 +693,16 @@
 .tla-audio-wrap p {
   margin: 0 0 6px;
   color: var(--tla-muted);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .tla-audio-wrap audio {
   width: 100%;
 }
 
+/* =========================================================
+   PRONUNCIATION OPTIONS
+   ========================================================= */
 .tla-pron-option-list {
   display: grid;
   gap: 12px;
@@ -490,43 +710,49 @@
 }
 
 .tla-pron-option-card {
-  border: 1px solid #c9d6f5;
-  border-radius: 10px;
+  border: var(--tla-pixel-border);
+  box-shadow: 3px 3px 0 rgba(26, 26, 46, 0.2);
   padding: 10px 12px;
-  background: #fbfdff;
+  background: #fafcff;
 }
 
 .tla-pron-option-card p {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 
+/* =========================================================
+   STATS CARD
+   ========================================================= */
 .tla-stats-card {
-  border-left: 6px solid #0f7f5f;
+  border-left: 5px solid #0f7f5f;
 }
 
 .tla-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
   margin: 8px 0 14px;
 }
 
 .tla-stats-item {
-  border: 1px solid #c7d9f5;
+  border: 2px solid #1a1a2e;
   background: #f8fbff;
-  border-radius: 10px;
   padding: 10px 12px;
+  box-shadow: 2px 2px 0 rgba(26, 26, 46, 0.2);
 }
 
 .tla-stats-item strong {
   display: block;
-  font-size: 1.25rem;
+  font-family: var(--tla-pixel-font);
+  font-size: 13px;
   color: #173d77;
+  margin-bottom: 4px;
+  line-height: 1.5;
 }
 
 .tla-stats-item span {
   color: #3e5278;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .tla-stage-stats {
@@ -540,106 +766,212 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  border: 1px solid #d2ddf5;
-  border-radius: 10px;
+  border: 2px solid #d2ddf5;
+  box-shadow: 2px 2px 0 rgba(26, 26, 46, 0.1);
   background: #f9fbff;
   padding: 8px 10px;
 }
 
 .tla-stage-stats-row strong {
   min-width: 120px;
+  font-family: var(--tla-pixel-font);
+  font-size: 8px;
+  line-height: 1.7;
 }
 
+/* =========================================================
+   COMPLETION CARD
+   ========================================================= */
 .tla-complete-card {
-  border-left: 6px solid #0f7f5f;
-  background: linear-gradient(180deg, #f2fff8 0%, #e8f8ef 100%);
+  border-left: 5px solid #0f7f5f;
+  background: linear-gradient(180deg, #edfff4 0%, #d8f8e8 100%);
+  border: var(--tla-pixel-border);
+  box-shadow: var(--tla-pixel-shadow);
 }
 
-.tla-option-row .tla-btn {
-  animation: tlaOptionIn 0.32s ease both;
+.tla-complete-card h3 {
+  color: #044f2a;
 }
 
-.tla-option-row .tla-btn:nth-child(1) {
-  animation-delay: 0.02s;
+/* =========================================================
+   INSTRUCTIONS VIEW
+   ========================================================= */
+.tla-instructions-view {
+  animation: tlaCardIn 0.28s ease both;
 }
 
-.tla-option-row .tla-btn:nth-child(2) {
-  animation-delay: 0.06s;
+.tla-pixel-heading {
+  font-family: var(--tla-pixel-font);
+  font-size: 11px;
+  color: var(--tla-text);
+  line-height: 1.7;
+  margin: 0 0 16px;
 }
 
-.tla-option-row .tla-btn:nth-child(3) {
-  animation-delay: 0.1s;
+.tla-instruction-block {
+  border: var(--tla-pixel-border);
+  box-shadow: var(--tla-pixel-shadow);
+  background: #ffffff;
+  margin-bottom: 14px;
+  overflow: hidden;
 }
 
-.tla-option-row .tla-btn:nth-child(4) {
-  animation-delay: 0.14s;
+.tla-instruction-block-header {
+  background: var(--tla-shell-bg);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.tla-option-row .tla-btn:nth-child(5) {
-  animation-delay: 0.18s;
+.tla-instruction-block-number {
+  font-family: var(--tla-pixel-font);
+  font-size: 16px;
+  color: var(--tla-gold);
+  line-height: 1;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
+.tla-instruction-block-title {
+  font-family: var(--tla-pixel-font);
+  font-size: 9px;
+  color: var(--tla-gold);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.tla-instruction-block-body {
+  padding: 12px 14px;
+}
+
+.tla-instruction-block-body p {
+  margin: 0 0 8px;
+  color: #2a3450;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.tla-instruction-block-body p:last-child {
+  margin-bottom: 0;
+}
+
+.tla-instruction-block-body strong {
+  color: #1a1a2e;
+}
+
+.tla-instruction-block-tag {
+  display: inline-block;
+  background: var(--tla-shell-bg);
+  color: var(--tla-gold);
+  font-family: var(--tla-pixel-font);
+  font-size: 7px;
+  padding: 3px 8px;
+  margin-right: 4px;
+  margin-bottom: 6px;
+  line-height: 1.7;
+}
+
+.tla-instruction-divider {
+  border: none;
+  border-top: var(--tla-pixel-border);
+  margin: 18px 0;
+  opacity: 0.2;
+}
+
+/* =========================================================
+   OPTION BUTTON STAGGER ANIMATION
+   ========================================================= */
+.tla-option-row .tla-btn { animation: tlaOptionIn 0.26s ease both; }
+.tla-option-row .tla-btn:nth-child(1) { animation-delay: 0.02s; }
+.tla-option-row .tla-btn:nth-child(2) { animation-delay: 0.06s; }
+.tla-option-row .tla-btn:nth-child(3) { animation-delay: 0.10s; }
+.tla-option-row .tla-btn:nth-child(4) { animation-delay: 0.14s; }
+.tla-option-row .tla-btn:nth-child(5) { animation-delay: 0.18s; }
+
+/* =========================================================
+   PIXEL BURST (correct answer particles)
+   ========================================================= */
+.tla-burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 0;
+  height: 0;
+}
+
+.tla-burst-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  animation: tlaBurstStar 0.75s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
 @keyframes tlaCardIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes tlaPopIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes tlaOptionIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes tlaGoodPulse {
-  0% {
-    transform: scale(0.98);
-  }
-  100% {
-    transform: scale(1);
-  }
+@keyframes tlaCorrectPop {
+  0%   { transform: scale(0.95); }
+  55%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 @keyframes tlaShake {
-  0% {
-    transform: translateX(0);
-  }
-  30% {
-    transform: translateX(-4px);
-  }
-  60% {
-    transform: translateX(3px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(5px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(3px); }
+  100% { transform: translateX(0); }
 }
 
+@keyframes tlaBurstStar {
+  0%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity: 0; }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
 @media (max-width: 768px) {
-  .tla-header-row {
-    flex-direction: column;
-    align-items: stretch;
+  .tla-game-title {
+    font-size: 10px;
+  }
+
+  .tla-nav-tab {
+    font-size: 7px;
+    padding: 10px 10px;
+  }
+
+  .tla-game-content {
+    padding: 12px;
+    font-size: 17px;
+  }
+
+  .tla-btn {
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+
+  .tla-syllable {
+    font-size: 70px;
   }
 
   .tla-progress-head {
@@ -653,20 +985,7 @@
     gap: 6px;
   }
 
-  .tla-shell {
-    font-size: 17px;
-  }
-
-  .tla-btn {
-    font-size: 1.08rem;
-    padding: 10px 14px;
-  }
-
-  .tla-syllable {
-    font-size: 68px;
-  }
-
-  .tla-stage-pill {
-    font-size: 0.87rem;
+  .tla-stats-item strong {
+    font-size: 11px;
   }
 }

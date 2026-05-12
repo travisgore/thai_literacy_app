@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Thai Literacy App
  * Description: Interactive Thai-reading literacy app for adult English speakers with configurable content and SRS tracking.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: Codex
  * Text Domain: thai-literacy-app
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('TLA_PLUGIN_VERSION', '0.1.0');
+define('TLA_PLUGIN_VERSION', '0.2.0');
 define('TLA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TLA_PLUGIN_URL', plugin_dir_url(__FILE__));
 

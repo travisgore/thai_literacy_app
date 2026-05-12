@@ -10,6 +10,25 @@
     pronunciation: 'Pronunciation',
   };
 
+  const stageInstructions = {
+    vowel: {
+      title: 'VOWEL STAGE',
+      text: 'Look at the vowel pattern and learn what sound it makes. Tap the symbol to hear it, then press "Start test" — you\'ll pick the correct sound from a list.',
+    },
+    consonant: {
+      title: 'CONSONANT STAGE',
+      text: 'Each consonant belongs to a class: High, Mid, or Low. The class affects the tone of every word it starts. Learn the sound and class, then identify it when tested.',
+    },
+    tone: {
+      title: 'TONE STAGE',
+      text: 'Thai has 5 tones — Flat, Low, Falling, High, and Rising. Use the consonant class and tone mark shown to figure out which tone this word has.',
+    },
+    pronunciation: {
+      title: 'PRONUNCIATION STAGE',
+      text: 'Read the full word! Listen to the audio clips and pick the pronunciation that matches the Thai word shown. This brings all your skills together.',
+    },
+  };
+
   const toneChoices = [
     { value: 'mid', label: 'Flat' },
     { value: 'low', label: 'Low' },
@@ -357,6 +376,45 @@
     return normalized;
   };
 
+  /* ----------------------------------------------------------
+     PIXEL BURST ANIMATION
+  ---------------------------------------------------------- */
+  const triggerPixelBurst = (sourceElement) => {
+    if (!sourceElement) return;
+    const rect = sourceElement.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const burst = document.createElement('div');
+    burst.className = 'tla-burst';
+    burst.style.left = `${cx}px`;
+    burst.style.top = `${cy}px`;
+
+    const symbols = ['★', '✦', '◆', '●', '★', '✦'];
+    const colors = ['#ffd700', '#ffec6e', '#ff8c00', '#00d47e', '#4ecdc4', '#ffd700'];
+
+    for (let i = 0; i < 12; i++) {
+      const star = document.createElement('span');
+      star.className = 'tla-burst-star';
+      star.textContent = symbols[i % symbols.length];
+      star.style.color = colors[i % colors.length];
+
+      const angle = (i / 12) * 360 + Math.random() * 15;
+      const dist = 48 + Math.random() * 56;
+      const dx = Math.cos((angle * Math.PI) / 180) * dist;
+      const dy = Math.sin((angle * Math.PI) / 180) * dist - 20;
+
+      star.style.setProperty('--dx', `${dx}px`);
+      star.style.setProperty('--dy', `${dy}px`);
+      star.style.animationDelay = `${i * 0.02}s`;
+
+      burst.appendChild(star);
+    }
+
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 900);
+  };
+
   const initRoot = (root) => {
     if (!root || initializedRoots.has(root)) return;
     initializedRoots.add(root);
@@ -391,8 +449,9 @@
       progress: {},
       lastStage: '',
       stats: buildEmptyStats(),
-      showStats: false,
       keepPracticing: false,
+      currentView: 'game',
+      showInfoPopup: false,
     };
 
     const fetchConfig = async () => {
@@ -810,6 +869,10 @@
       };
     };
 
+    /* ----------------------------------------------------------
+       RENDER HELPERS
+    ---------------------------------------------------------- */
+
     const renderWord = (combo, options = {}) => {
       const audioUrl = typeof options.audioUrl === 'string' ? options.audioUrl.trim() : '';
       const isClickable = !!options.clickable && !!audioUrl;
@@ -853,98 +916,62 @@
       `;
     };
 
-    const renderStageProgress = () =>
-      `<p class="tla-srs-note">Interleaved SRS review is active. The app chooses the next card automatically.</p>`;
-
     const renderProgressBar = (mastery) => `
       <section class="tla-card tla-progress-card">
         <div class="tla-progress-head">
-          <h3>Section progress</h3>
-          <p>${mastery.masteredCount}/${mastery.totalCount} items mastered (${mastery.percent}%)</p>
+          <h3>Section Progress</h3>
+          <p>${mastery.masteredCount}/${mastery.totalCount} mastered &mdash; ${mastery.percent}%</p>
         </div>
         <div class="tla-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${mastery.percent}">
           <div class="tla-progress-fill" style="width:${mastery.percent}%"></div>
         </div>
-        <p class="tla-progress-note">Goal: get each item right ${mastery.targetStreak} times in a row.</p>
+        <p class="tla-progress-note">Get each card right ${mastery.targetStreak} times in a row to master it.</p>
       </section>
     `;
 
-    const renderColorLegend = () => `
-      <section class="tla-card tla-legend-card">
-        <h3>Color guide</h3>
-        <p>Consonant classes stay color coded to help pattern recognition.</p>
-        <div class="tla-legend-grid">
-          <span class="tla-badge tla-group-high">High class</span>
-          <span class="tla-badge tla-group-mid">Middle class</span>
-          <span class="tla-badge tla-group-low">Low class</span>
+    const renderStageBanner = () => {
+      if (!state.round) return '';
+      const info = stageInstructions[state.round.stage];
+      if (!info) return '';
+      return `
+        <div class="tla-stage-banner">
+          <span class="tla-stage-banner-label">${esc(info.title)}</span>
+          <p>${esc(info.text)}</p>
         </div>
-      </section>
-    `;
+      `;
+    };
 
-    const renderRoundMeta = () => `<p class="tla-meta"><strong>SRS turn:</strong> ${state.turn}</p>`;
+    const renderInfoPopup = () => `
+      <div class="tla-info-section">
+        <h4>Color Guide</h4>
+        <div class="tla-info-legend-row">
+          <span class="tla-info-dot" style="background:#e07000"></span>
+          <span>High class consonant</span>
+        </div>
+        <div class="tla-info-legend-row">
+          <span class="tla-info-dot" style="background:#0f5ec0"></span>
+          <span>Mid class consonant</span>
+        </div>
+        <div class="tla-info-legend-row">
+          <span class="tla-info-dot" style="background:#00903c"></span>
+          <span>Low class consonant</span>
+        </div>
+      </div>
+      <div class="tla-info-section">
+        <h4>How Learning Works</h4>
+        <p>Cards you struggle with appear more often. Cards you master are spaced out and reviewed less.</p>
+        <p>Get each card right <strong style="color:#ffd700">${masteryStreakTarget}× in a row</strong> to master it.</p>
+      </div>
+      <div class="tla-info-section">
+        <h4>The 4 Stages</h4>
+        <p>Each word is practiced across 4 stages: <strong style="color:#ffd700">Vowel → Consonant → Tone → Pronunciation</strong>. All 4 must be mastered to complete the section.</p>
+      </div>
+    `;
 
     const formatLatency = (ms) => {
       if (!ms) return 'n/a';
       return `${(ms / 1000).toFixed(1)}s`;
     };
-
-    const renderStatsBack = (mastery) => {
-      const attempts = state.stats.attempts || 0;
-      const accuracy = attempts ? Math.round((state.stats.correct / attempts) * 100) : 0;
-      const avgMs = attempts ? Math.round(state.stats.totalLatencyMs / attempts) : 0;
-
-      return `
-        <section class="tla-card tla-stats-card">
-          <div class="tla-card-lead">
-            <span class="tla-stage-context-pill">Stats</span>
-            <div class="tla-card-lead-copy">
-              <h3>Your learning stats</h3>
-              <p>Track results, speed, and mastery progress.</p>
-            </div>
-          </div>
-
-          <div class="tla-stats-grid">
-            <div class="tla-stats-item"><strong>${attempts}</strong><span>Total answers</span></div>
-            <div class="tla-stats-item"><strong>${state.stats.correct}</strong><span>Correct</span></div>
-            <div class="tla-stats-item"><strong>${state.stats.wrong}</strong><span>Wrong</span></div>
-            <div class="tla-stats-item"><strong>${accuracy}%</strong><span>Accuracy</span></div>
-            <div class="tla-stats-item"><strong>${formatLatency(avgMs)}</strong><span>Average speed</span></div>
-            <div class="tla-stats-item"><strong>${formatLatency(state.stats.fastestMs)}</strong><span>Fastest answer</span></div>
-            <div class="tla-stats-item"><strong>${formatLatency(state.stats.slowestMs)}</strong><span>Slowest answer</span></div>
-            <div class="tla-stats-item"><strong>${state.stats.bestCorrectStreak}</strong><span>Best correct streak</span></div>
-            <div class="tla-stats-item"><strong>${mastery.masteredCount}/${mastery.totalCount}</strong><span>Mastered items</span></div>
-          </div>
-
-          <div class="tla-stage-stats">
-            ${stageOrder
-              .map((stage) => {
-                const row = state.stats.byStage[stage] || emptyStageStats();
-                const stageAccuracy = row.attempts ? Math.round((row.correct / row.attempts) * 100) : 0;
-                const stageAvg = row.attempts ? Math.round(row.totalLatencyMs / row.attempts) : 0;
-                return `
-                  <div class="tla-stage-stats-row">
-                    <strong>${esc(stageLabels[stage])}</strong>
-                    <span>${row.correct}/${row.attempts} correct (${stageAccuracy}%)</span>
-                    <span>Avg ${formatLatency(stageAvg)}</span>
-                  </div>
-                `;
-              })
-              .join('')}
-          </div>
-
-          <button type="button" class="tla-btn tla-primary-btn" data-action="show-game">Back to game</button>
-        </section>
-      `;
-    };
-
-    const renderCompletionCard = () => `
-      <section class="tla-card tla-complete-card">
-        <h3>Congratulations!</h3>
-        <p>You completed this section with strong mastery.</p>
-        <p>Move on to the next section when you are ready.</p>
-        <button type="button" class="tla-btn tla-primary-btn" data-action="continue-practice">Continue practicing here</button>
-      </section>
-    `;
 
     const renderCardLead = (title, subtitle) => {
       const stage = state.round ? state.round.stage : '';
@@ -975,8 +1002,9 @@
 
       if (state.round.stage === 'vowel') {
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-learn">
-            ${renderCardLead('Step 1: Learn the answer', 'อ (aw ang) is used as a placeholder when there is no consonant.')}
+            ${renderCardLead('Learn the Answer', 'อ (aw ang) is a placeholder shown when there is no consonant.')}
             ${renderLearnSymbol(
               combo.vowel.with_aw_ang || combo.vowel.pattern || combo.vowel.label,
               'tla-group-neutral',
@@ -987,7 +1015,7 @@
             <p class="tla-meta"><strong>Word Example:</strong> ${esc(combo.text || '')}</p>
             ${combo.vowel.sound ? `<p class="tla-meta"><strong>Sound:</strong> ${esc(combo.vowel.sound)}</p>` : ''}
             ${combo.vowel.hint ? `<p class="tla-explanation">${esc(combo.vowel.hint)}</p>` : ''}
-            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test</button>
+            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test &rarr;</button>
           </section>
         `;
       }
@@ -996,44 +1024,47 @@
         const consonantOnly = combo.consonant && combo.consonant.glyph ? combo.consonant.glyph : '';
         const consonantClassName = `tla-group-${consonantTheme(combo.consonant ? combo.consonant.class : '')}`;
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-learn">
-            ${renderCardLead('Step 1: Learn the answer', 'Try to memorize the pronounciation and class of this consonant')}
+            ${renderCardLead('Learn the Answer', 'Remember the sound and class — both matter for tone.')}
             ${renderLearnSymbol(consonantOnly, consonantClassName, combo.audio_url)}
             ${renderWordExampleHint(combo, combo.audio_url)}
             <p class="tla-meta"><strong>Consonant sound:</strong> ${esc(combo.consonant.sound || '(not set)')}</p>
             <p class="tla-meta"><strong>Consonant class:</strong> ${esc(consonantClassLabel(combo.consonant.class) || 'n/a')}</p>
             ${combo.consonant.hint ? `<p class="tla-explanation">${esc(combo.consonant.hint)}</p>` : ''}
-            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test</button>
+            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test &rarr;</button>
           </section>
         `;
       }
 
       if (state.round.stage === 'tone') {
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-learn">
-            ${renderCardLead('Step 1: Learn the answer', 'Review the word parts before identifying the tone.')}
+            ${renderCardLead('Learn the Answer', 'Review all the word parts — then you\'ll identify the tone.')}
             ${renderWord(combo, { clickable: true, audioUrl: combo.audio_url })}
             <div class="tla-badge-row">
               <span class="tla-badge">Vowel: ${esc(combo.vowel ? combo.vowel.label || combo.vowel.id : 'n/a')}</span>
               <span class="tla-badge">Consonant: ${esc(combo.consonant ? combo.consonant.glyph : 'n/a')}</span>
-              <span class="tla-badge">Consonant class: ${esc(
+              <span class="tla-badge">Class: ${esc(
                 consonantClassLabel(combo.consonant ? combo.consonant.class : '') || 'n/a'
               )}</span>
-              <span class="tla-badge">Tone marker: ${esc(markerLabel(combo.marker))} (${esc(markerGlyph(combo.marker))})</span>
+              <span class="tla-badge">Tone mark: ${esc(markerLabel(combo.marker))} (${esc(markerGlyph(combo.marker))})</span>
             </div>
             <p class="tla-meta"><strong>Correct tone:</strong> ${esc(toneLabel(combo.tone))}</p>
-            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test</button>
+            <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test &rarr;</button>
           </section>
         `;
       }
 
       return `
+        ${renderStageBanner()}
         <section class="tla-card tla-card-learn">
-          ${renderCardLead('Step 1: Learn the answer', 'Study pronunciation with audio and meaning before testing.')}
+          ${renderCardLead('Learn the Answer', 'Study the pronunciation and meaning before testing yourself.')}
           ${renderWord(combo, { clickable: true, audioUrl: combo.audio_url })}
           <p class="tla-meta"><strong>Pronunciation:</strong> ${esc(combo.pronunciation || '(not set)')}</p>
           ${combo.description ? `<p class="tla-explanation">${esc(combo.description)}</p>` : ''}
-          <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test</button>
+          <button type="button" class="tla-btn tla-primary-btn" data-action="start-test">Start test &rarr;</button>
         </section>
       `;
     };
@@ -1044,14 +1075,14 @@
         <div class="tla-feedback ${state.feedback.correct ? 'is-correct' : 'is-incorrect'}">${esc(
           state.feedback.message
         )}</div>
-        <button type="button" class="tla-btn tla-primary-btn tla-next-btn" data-action="next-item">Next item</button>
+        <button type="button" class="tla-btn tla-primary-btn tla-next-btn" data-action="next-item">Next &rarr;</button>
       `;
     };
 
     const renderSubmitChoice = () => {
       if (state.feedback) return '';
       const disabled = state.selectedChoice ? '' : 'disabled';
-      return `<button type="button" class="tla-btn tla-primary-btn tla-submit-btn" data-action="submit-choice" ${disabled}>Next: check answer</button>`;
+      return `<button type="button" class="tla-btn tla-primary-btn tla-submit-btn" data-action="submit-choice" ${disabled}>Check answer</button>`;
     };
 
     const renderChoiceButtons = (options) =>
@@ -1074,7 +1105,7 @@
               ${option.description ? `<p>${esc(option.description)}</p>` : ''}
               <button type="button" class="tla-btn ${state.selectedChoice === option.value ? 'is-active' : ''}" data-action="pick-choice" data-value="${esc(
                 option.value
-              )}" data-audio="${esc(option.audio_url || '')}">Preview / choose</button>
+              )}" data-audio="${esc(option.audio_url || '')}">Preview &amp; choose</button>
             </div>
           `
           )
@@ -1097,8 +1128,9 @@
       if (state.round.stage === 'vowel') {
         const vowelDisplay = combo.vowel ? combo.vowel.with_aw_ang || combo.vowel.pattern || combo.vowel.label || '' : '';
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-test">
-            ${renderCardLead('Step 2: Test yourself', 'What sound does this vowel make?')}
+            ${renderCardLead('Test Yourself', 'What sound does this vowel make?')}
             <p class="tla-syllable tla-group-neutral"><span class="tla-thai tla-vowel-text">${esc(vowelDisplay)}</span></p>
             <div class="tla-row tla-option-row">${renderChoiceButtons(state.round.options)}</div>
             ${renderSubmitChoice()}
@@ -1109,8 +1141,9 @@
 
       if (state.round.stage === 'consonant') {
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-test">
-            ${renderCardLead('Step 2: Test yourself', 'What sound does the consonant make in this word?')}
+            ${renderCardLead('Test Yourself', 'What sound does the consonant make in this word?')}
             ${renderWord(combo)}
             <div class="tla-row tla-option-row">${renderChoiceButtons(state.round.options)}</div>
             ${renderSubmitChoice()}
@@ -1126,8 +1159,9 @@
         }));
 
         return `
+          ${renderStageBanner()}
           <section class="tla-card tla-card-test">
-            ${renderCardLead('Step 2: Test yourself', 'What is the tone of this word?')}
+            ${renderCardLead('Test Yourself', 'What is the tone of this word?')}
             ${renderWord(combo)}
             <div class="tla-row tla-option-row">${renderChoiceButtons(options)}</div>
             ${renderSubmitChoice()}
@@ -1137,8 +1171,9 @@
       }
 
       return `
+        ${renderStageBanner()}
         <section class="tla-card tla-card-test">
-          ${renderCardLead('Step 2: Test yourself', 'Select the correct pronunciation using both audio and description.')}
+          ${renderCardLead('Test Yourself', 'Select the correct pronunciation using audio and description.')}
           ${renderWord(combo)}
           ${renderPronunciationOptions()}
           ${renderSubmitChoice()}
@@ -1147,44 +1182,195 @@
       `;
     };
 
+    const renderStatsView = (mastery) => {
+      const attempts = state.stats.attempts || 0;
+      const accuracy = attempts ? Math.round((state.stats.correct / attempts) * 100) : 0;
+      const avgMs = attempts ? Math.round(state.stats.totalLatencyMs / attempts) : 0;
+
+      return `
+        <section class="tla-card tla-stats-card">
+          <h3>Your Learning Stats</h3>
+
+          <div class="tla-stats-grid">
+            <div class="tla-stats-item"><strong>${attempts}</strong><span>Total answers</span></div>
+            <div class="tla-stats-item"><strong>${state.stats.correct}</strong><span>Correct</span></div>
+            <div class="tla-stats-item"><strong>${state.stats.wrong}</strong><span>Wrong</span></div>
+            <div class="tla-stats-item"><strong>${accuracy}%</strong><span>Accuracy</span></div>
+            <div class="tla-stats-item"><strong>${formatLatency(avgMs)}</strong><span>Avg speed</span></div>
+            <div class="tla-stats-item"><strong>${formatLatency(state.stats.fastestMs)}</strong><span>Fastest</span></div>
+            <div class="tla-stats-item"><strong>${formatLatency(state.stats.slowestMs)}</strong><span>Slowest</span></div>
+            <div class="tla-stats-item"><strong>${state.stats.bestCorrectStreak}</strong><span>Best streak</span></div>
+            <div class="tla-stats-item"><strong>${mastery.masteredCount}/${mastery.totalCount}</strong><span>Mastered</span></div>
+          </div>
+
+          <div class="tla-stage-stats">
+            ${stageOrder
+              .map((stage) => {
+                const row = state.stats.byStage[stage] || emptyStageStats();
+                const stageAccuracy = row.attempts ? Math.round((row.correct / row.attempts) * 100) : 0;
+                const stageAvg = row.attempts ? Math.round(row.totalLatencyMs / row.attempts) : 0;
+                return `
+                  <div class="tla-stage-stats-row">
+                    <strong>${esc(stageLabels[stage])}</strong>
+                    <span>${row.correct}/${row.attempts} correct (${stageAccuracy}%)</span>
+                    <span>Avg ${formatLatency(stageAvg)}</span>
+                  </div>
+                `;
+              })
+              .join('')}
+          </div>
+        </section>
+      `;
+    };
+
+    const renderInstructionsView = () => `
+      <div class="tla-instructions-view">
+        <h3 class="tla-pixel-heading">How To Play</h3>
+
+        <p style="color:#2a3450;margin-bottom:16px;font-size:0.95rem;line-height:1.6;">
+          Every Thai word you study is broken into <strong>4 learning stages</strong>.
+          You must master each stage individually before it's complete.
+        </p>
+
+        <div class="tla-instruction-block">
+          <div class="tla-instruction-block-header">
+            <span class="tla-instruction-block-number">1</span>
+            <h4 class="tla-instruction-block-title">VOWEL STAGE</h4>
+          </div>
+          <div class="tla-instruction-block-body">
+            <p><strong>What you learn:</strong> Thai vowel patterns and the sounds they make.</p>
+            <p><strong>Why it matters:</strong> Vowels can appear above, below, before, or after a consonant. Knowing the vowel pattern lets you decode any written word.</p>
+            <p><strong>How to play:</strong> Study the vowel shown (with อ as a consonant placeholder). Tap it to hear its sound. Press "Start test" — then pick the matching sound from the list.</p>
+            <span class="tla-instruction-block-tag">Sound recognition</span>
+            <span class="tla-instruction-block-tag">Pattern reading</span>
+          </div>
+        </div>
+
+        <div class="tla-instruction-block">
+          <div class="tla-instruction-block-header">
+            <span class="tla-instruction-block-number">2</span>
+            <h4 class="tla-instruction-block-title">CONSONANT STAGE</h4>
+          </div>
+          <div class="tla-instruction-block-body">
+            <p><strong>What you learn:</strong> Consonant sounds and their class (High, Mid, or Low).</p>
+            <p><strong>Why it matters:</strong> The first consonant's class is the single most important factor in determining a word's tone. Getting this right unlocks tone reading.</p>
+            <p><strong>How to play:</strong> Study the consonant, its sound, and its class. Color-coding helps: <strong style="color:#e07000">orange = High</strong>, <strong style="color:#0f5ec0">blue = Mid</strong>, <strong style="color:#00903c">green = Low</strong>. Identify the correct sound when tested.</p>
+            <span class="tla-instruction-block-tag">Sound recognition</span>
+            <span class="tla-instruction-block-tag">Class identification</span>
+          </div>
+        </div>
+
+        <div class="tla-instruction-block">
+          <div class="tla-instruction-block-header">
+            <span class="tla-instruction-block-number">3</span>
+            <h4 class="tla-instruction-block-title">TONE STAGE</h4>
+          </div>
+          <div class="tla-instruction-block-body">
+            <p><strong>What you learn:</strong> How to calculate the correct tone using consonant class and tone marks.</p>
+            <p><strong>Why it matters:</strong> Thai is a tonal language — the same syllable with a different tone is a completely different word. Reading the tone correctly is essential for comprehension.</p>
+            <p><strong>How to play:</strong> Review the consonant class, tone mark, and vowel shown. Use them to determine: Flat, Low, Falling, High, or Rising. Then select your answer.</p>
+            <span class="tla-instruction-block-tag">Tone rules</span>
+            <span class="tla-instruction-block-tag">Pattern calculation</span>
+          </div>
+        </div>
+
+        <div class="tla-instruction-block">
+          <div class="tla-instruction-block-header">
+            <span class="tla-instruction-block-number">4</span>
+            <h4 class="tla-instruction-block-title">PRONUNCIATION STAGE</h4>
+          </div>
+          <div class="tla-instruction-block-body">
+            <p><strong>What you learn:</strong> Connecting written Thai words to their spoken pronunciation and meaning.</p>
+            <p><strong>Why it matters:</strong> This is the final integration step — you're doing real Thai reading! All the parts come together: vowel + consonant + tone + word recognition.</p>
+            <p><strong>How to play:</strong> Look at the Thai word shown. Listen to the audio clips for each option and pick the one that matches. You'll also see the English meaning to help confirm.</p>
+            <span class="tla-instruction-block-tag">Vocabulary</span>
+            <span class="tla-instruction-block-tag">Full reading</span>
+          </div>
+        </div>
+
+        <hr class="tla-instruction-divider" />
+
+        <h3 class="tla-pixel-heading">Mastery System</h3>
+
+        <div class="tla-instruction-block">
+          <div class="tla-instruction-block-header">
+            <span class="tla-instruction-block-number" style="font-size:13px">SRS</span>
+            <h4 class="tla-instruction-block-title">SPACED REPETITION</h4>
+          </div>
+          <div class="tla-instruction-block-body">
+            <p>Cards you struggle with come back sooner. Cards you answer correctly are spaced further apart — this matches how your memory actually works.</p>
+            <p>Get a card right <strong>${masteryStreakTarget} times in a row</strong> to master it. Once all cards are mastered, you've completed the section!</p>
+            <p>Your progress is saved automatically in your browser — you can pick up right where you left off.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const renderCompletionCard = () => `
+      <section class="tla-card tla-complete-card">
+        <h3>Congratulations!</h3>
+        <p>You completed this section with strong mastery.</p>
+        <p>Move on to the next section when you are ready.</p>
+        <button type="button" class="tla-btn tla-primary-btn" data-action="continue-practice">Keep practicing here</button>
+      </section>
+    `;
+
+    /* ----------------------------------------------------------
+       MAIN RENDER
+    ---------------------------------------------------------- */
+
     const renderMain = () => {
       const mastery = getMasterySnapshot();
-      const roundCard =
-        mastery.isComplete && !state.keepPracticing
-          ? renderCompletionCard()
-          : state.phase === 'learn'
-          ? renderLearnCard()
-          : renderTestCard();
+
+      let contentHtml = '';
+      if (state.currentView === 'stats') {
+        contentHtml = renderStatsView(mastery);
+      } else if (state.currentView === 'instructions') {
+        contentHtml = renderInstructionsView();
+      } else {
+        const roundCard =
+          mastery.isComplete && !state.keepPracticing
+            ? renderCompletionCard()
+            : state.phase === 'learn'
+            ? renderLearnCard()
+            : renderTestCard();
+        contentHtml = `
+          ${renderProgressBar(mastery)}
+          ${roundCard}
+        `;
+      }
+
+      const popupClass = state.showInfoPopup ? 'is-open' : '';
+      const infoBtnClass = state.showInfoPopup ? 'is-open' : '';
 
       root.innerHTML = `
         <div class="tla-shell">
-          <div class="tla-flip-scene">
-            <div class="tla-flip-card ${state.showStats ? 'is-flipped' : ''}">
-              <div class="tla-flip-face tla-flip-front">
-                <header class="tla-header">
-                  <div class="tla-header-row">
-                    <div>
-                      <h2>${esc(state.config.app_title)}</h2>
-                      <p>Learn first, then test. Cards are automatically interleaved in SRS order.</p>
-                    </div>
-                    <button type="button" class="tla-btn tla-stats-toggle" data-action="toggle-stats">View stats</button>
-                  </div>
-                </header>
-                ${renderProgressBar(mastery)}
-                ${renderColorLegend()}
-                ${renderStageProgress()}
-                ${renderRoundMeta()}
-                ${roundCard}
-              </div>
-
-              <div class="tla-flip-face tla-flip-back">
-                ${renderStatsBack(mastery)}
+          <div class="tla-game-header">
+            <div class="tla-game-header-row">
+              <h2 class="tla-game-title">${esc(state.config.app_title)}</h2>
+              <div class="tla-info-wrap">
+                <button type="button" class="tla-info-btn ${infoBtnClass}" data-action="toggle-info" aria-label="Game information">?</button>
+                <div class="tla-info-popup ${popupClass}">
+                  ${renderInfoPopup()}
+                </div>
               </div>
             </div>
+            <nav class="tla-nav">
+              <button type="button" class="tla-nav-tab ${state.currentView === 'game' ? 'is-active' : ''}" data-action="view-game">&#9654; Play</button>
+              <button type="button" class="tla-nav-tab ${state.currentView === 'instructions' ? 'is-active' : ''}" data-action="view-instructions">&#9432; How to Play</button>
+              <button type="button" class="tla-nav-tab ${state.currentView === 'stats' ? 'is-active' : ''}" data-action="view-stats">&#9776; Stats</button>
+            </nav>
+          </div>
+          <div class="tla-game-content">
+            ${contentHtml}
           </div>
         </div>
       `;
     };
+
+    /* ----------------------------------------------------------
+       SCORE + SIDE EFFECTS
+    ---------------------------------------------------------- */
 
     const scoreAnswer = async (isCorrect, payload) => {
       const latency = state.timerStarted ? Math.round(performance.now() - state.timerStarted) : 0;
@@ -1218,33 +1404,61 @@
       }
     };
 
+    /* ----------------------------------------------------------
+       EVENT DELEGATION
+    ---------------------------------------------------------- */
+
     root.addEventListener('click', async (event) => {
       const target = event.target.closest('[data-action]');
-      if (!target) return;
+      if (!target) {
+        // Click outside info popup closes it
+        if (state.showInfoPopup) {
+          state.showInfoPopup = false;
+          renderMain();
+        }
+        return;
+      }
 
       const action = target.dataset.action;
 
-      if (action === 'toggle-stats') {
-        state.showStats = true;
+      if (action === 'toggle-info') {
+        state.showInfoPopup = !state.showInfoPopup;
         renderMain();
         return;
       }
 
-      if (action === 'show-game') {
-        state.showStats = false;
+      if (action === 'view-game') {
+        state.currentView = 'game';
+        state.showInfoPopup = false;
+        renderMain();
+        return;
+      }
+
+      if (action === 'view-instructions') {
+        state.currentView = 'instructions';
+        state.showInfoPopup = false;
+        renderMain();
+        return;
+      }
+
+      if (action === 'view-stats') {
+        state.currentView = 'stats';
+        state.showInfoPopup = false;
         renderMain();
         return;
       }
 
       if (action === 'continue-practice') {
         state.keepPracticing = true;
+        state.currentView = 'game';
         prepareRound();
         renderMain();
         return;
       }
 
-      if (state.showStats) {
-        return;
+      // Close info popup on any non-info action
+      if (state.showInfoPopup) {
+        state.showInfoPopup = false;
       }
 
       if (action === 'play-audio') {
@@ -1293,6 +1507,11 @@
       const isCorrect = guessed === state.round.answer;
       const combo = state.round.combo;
 
+      // Trigger particle burst on correct answer before re-render
+      if (isCorrect) {
+        triggerPixelBurst(target);
+      }
+
       if (state.round.stage === 'vowel') {
         const correctLabel = combo.vowel ? combo.vowel.sound || '(not set)' : 'the configured sound';
         const reinforceAudioUrl =
@@ -1301,7 +1520,7 @@
           itemId: state.round.id,
           mode: state.round.mode,
           errorTags: ['vowel_mismatch'],
-          message: isCorrect ? 'Correct.' : `Not quite. The correct vowel sound is ${correctLabel}.`,
+          message: isCorrect ? '★ Correct!' : `Not quite — the vowel sound is "${correctLabel}".`,
           reinforceAudioUrl,
         });
         return;
@@ -1314,7 +1533,7 @@
           itemId: state.round.id,
           mode: state.round.mode,
           errorTags: ['consonant_mismatch'],
-          message: isCorrect ? 'Correct.' : `Not quite. The correct consonant sound is ${correctLabel}.`,
+          message: isCorrect ? '★ Correct!' : `Not quite — the consonant sound is "${correctLabel}".`,
           reinforceAudioUrl,
         });
         return;
@@ -1326,8 +1545,8 @@
           mode: state.round.mode,
           errorTags: ['tone_mismatch'],
           message: isCorrect
-            ? `Correct. Tone is ${toneLabel(state.round.answer)}.`
-            : `Not quite. The correct tone is ${toneLabel(state.round.answer)}.`,
+            ? `★ Correct! Tone is ${toneLabel(state.round.answer)}.`
+            : `Not quite — the correct tone is ${toneLabel(state.round.answer)}.`,
           reinforceAudioUrl: combo.audio_url || '',
         });
         return;
@@ -1337,14 +1556,18 @@
         itemId: state.round.id,
         mode: state.round.mode,
         errorTags: ['pronunciation_mismatch'],
-        message: isCorrect ? 'Correct.' : 'Not quite. Review the pronunciation card and try the next one.',
+        message: isCorrect ? '★ Correct!' : 'Not quite — review the card and try the next one.',
         reinforceAudioUrl:
           (state.round.options.find((option) => option.value === state.round.answer) || {}).audio_url || combo.audio_url || '',
       });
     });
 
+    /* ----------------------------------------------------------
+       BOOTSTRAP
+    ---------------------------------------------------------- */
+
     const init = async () => {
-      root.innerHTML = '<p>Loading Thai literacy app…</p>';
+      root.innerHTML = '<p style="padding:20px;color:#fff;font-family:monospace;">Loading&hellip;</p>';
 
       try {
         state.config = await fetchConfig();
@@ -1394,14 +1617,14 @@
 
         if (!state.cards.length) {
           root.innerHTML =
-            '<p>This game has no training items yet. Add testing items in the post editor first.</p>';
+            '<p style="padding:20px;">This game has no training items yet. Add testing items in the post editor first.</p>';
           return;
         }
 
         prepareRound();
         renderMain();
       } catch (_error) {
-        root.innerHTML = '<p>Unable to load this game right now.</p>';
+        root.innerHTML = '<p style="padding:20px;">Unable to load this game right now.</p>';
       }
     };
 

@@ -350,7 +350,13 @@ class Thai_Literacy_App {
     }
 
     public function register_assets() {
-        wp_register_style('tla-app-style', TLA_PLUGIN_URL . 'assets/css/app.css', [], TLA_PLUGIN_VERSION);
+        wp_register_style(
+            'tla-pixel-font',
+            'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap',
+            [],
+            null
+        );
+        wp_register_style('tla-app-style', TLA_PLUGIN_URL . 'assets/css/app.css', ['tla-pixel-font'], TLA_PLUGIN_VERSION);
         wp_register_script('tla-app-script', TLA_PLUGIN_URL . 'assets/js/app.js', [], TLA_PLUGIN_VERSION, true);
     }
 
